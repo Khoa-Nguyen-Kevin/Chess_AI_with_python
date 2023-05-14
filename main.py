@@ -21,6 +21,7 @@ class Main:
         screen = self.screen
         dragger = self.game.dragger
         board = self.game.board
+        model = self.game.model
 
         while True:
             game.show_bg(screen)
@@ -33,7 +34,19 @@ class Main:
             if dragger.dragging:
                 dragger.updateBlit(screen)
 
-
+            if game.gamemode == PVE and game.next_player == BLACK and not game.gameover: #By default, machine's turn will always be Black
+                machinePiece, machineMove = model.captureWhenAbleMove(board, game.next_player)
+                board.move(machinePiece, machineMove)
+                game.next_turn()
+                #game.play_sound(isCaptured)
+                #Show methods
+                game.show_bg(screen)
+                game.show_last_move(screen)
+                game.show_pieces(screen)
+                if board.isStalemate(game.next_player):
+                    game.gameover = True
+                    game.show_game_over(screen, game.next_player)
+                    
             for event in pygame.event.get():
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -101,6 +114,9 @@ class Main:
                         screen = self.screen
                         dragger = self.game.dragger
                         board = self.game.board
+                        model = self.game.model
+                    if event.key == pygame.K_m: #TODO:Switch modes (PvP & PvE)
+                        game.change_modes()
 
                 elif event.type == pygame.QUIT:
                     pygame.quit()

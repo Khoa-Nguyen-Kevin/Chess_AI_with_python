@@ -19,6 +19,7 @@ class Board:
 
     def calValidMoves(self, piece, row, col, calInCheck=True):
         """Calculate all posible valid moves for the given piece and position"""
+        piece.clearMoves()
         if piece.name == PAWN: 
             possibleMoves = [
                 (row+piece.direction, col)

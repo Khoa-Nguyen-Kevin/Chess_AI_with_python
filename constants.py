@@ -7,6 +7,10 @@ ROWS = 8
 COLS = 8
 SQSIZE = WIDTH // COLS
 
+#Game modes
+PVP = 0
+PVE = 1
+
 #Piece information
 WHITE = 'white'
 BLACK = 'black'

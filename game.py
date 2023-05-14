@@ -4,16 +4,18 @@ from board import Board
 from dragger import Dragger
 from config import Config
 from square import Square
+from aimodel import AIModel
 
 class Game:
     def __init__(self):
         self.board = Board()
         self.dragger = Dragger()
+        self.model = AIModel()
         self.config = Config()
         self.next_player = WHITE
         self.hovered_sqr = None
         self.gameover = False
-
+        self.gamemode = PVP
 
     def show_bg(self, surface):
         for row in range(ROWS):
@@ -36,6 +38,12 @@ class Game:
                     lbl = self.config.font.render(Square.getAlphaCol(col), 1, color)
                     labelPos = (col *SQSIZE+SQSIZE-20, HEIGHT-20)
                     surface.blit(lbl, labelPos)
+                #Show current gamemode
+                color = '#ff1a1a'
+                mode = "Mode:PvP" if self.gamemode == PVP else "Mode:PvE"
+                lbl = self.config.modeFont.render(mode, 1, color)
+                labelPos = ((COLS - 1)*SQSIZE-20, 5) #Top-right corner
+                surface.blit(lbl, labelPos)
 
     def show_pieces(self, surface):
         for row in range(ROWS):
@@ -100,5 +108,8 @@ class Game:
     def set_hover(self, row, col):
         self.hovered_sqr = self.board.squares[row][col]
     
+    def change_modes(self):
+        self.gamemode = PVP if self.gamemode == PVE else PVE
+
     def reset(self):
         self.__init__()
