@@ -1,3 +1,4 @@
+import copy
 
 class Square:
 
@@ -14,6 +15,7 @@ class Square:
     
     def __repr__(self) -> str:
         return '(' + str(self.row) + ', ' + str(self.col) + ')'
+    
     
     def hasPiece(self):
         return self.piece != None

@@ -35,7 +35,7 @@ class Main:
                 dragger.updateBlit(screen)
 
             if game.gamemode == PVE and game.next_player == BLACK and not game.gameover: #By default, machine's turn will always be Black
-                machinePiece, machineMove = model.captureWhenAbleMove(board, game.next_player)
+                machinePiece, machineMove = model.alphaBetaPruning(board, game.next_player) #AI move
                 board.move(machinePiece, machineMove)
                 game.next_turn()
                 #game.play_sound(isCaptured)

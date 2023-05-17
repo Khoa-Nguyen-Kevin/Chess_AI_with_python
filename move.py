@@ -1,4 +1,7 @@
 
+from collections.abc import Iterable
+
+
 class Move:
 
     def __init__(self, initialPos, finalPos):
@@ -9,10 +12,10 @@ class Move:
         return isinstance(object, Move) and self.initialPos == object.initialPos and self.finalPos == object.finalPos
     
     def __str__(self) -> str:
-        return str(self.initialPos) + ", " + str(self.finalPos)
+        return str(self.initialPos) + "->" + str(self.finalPos)
     
     def __repr__(self) -> str:
-        return str(self.initialPos) + ", " + str(self.finalPos)
+        return str(self.initialPos) + "->" + str(self.finalPos)
     
     def __hash__(self) -> int:
         return hash(self.finalPos.col+10*self.finalPos.row) #We hash by final position, each square on board is one index starting from 0,1,2,3,4,5,6,7

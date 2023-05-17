@@ -1,6 +1,11 @@
 import random
 from constants import *
 import copy
+from move import Move
+from square import Square
+
+MINIMAX_CUTOFF = 2
+ALPHABETA_CUTOFF = 2
 
 class AIModel:
     def __init__(self) -> None:
@@ -62,8 +67,159 @@ class AIModel:
         boardValue = allyValue + rivalValue
         return boardValue
     
-    def minMaxMove(self, board, color):
-        pass
+    def miniMaxMove(self, board, color):
+        cutoffVal = MINIMAX_CUTOFF
+        tempBoard = copy.deepcopy(board)
+        if color == BLACK:
+            returnsTuple = self.minValue(tempBoard, cutoffVal)
+        else:
+            returnsTuple = self.maxValue(tempBoard, cutoffVal)
+        return returnsTuple[1], returnsTuple[2]
 
+    def maxValue(self, tempBoard, cutoff):
+        moveList = []
+        pieceList = []
+        valList = []
+        if cutoff == 0:
+            return self.calBoardValue(tempBoard), None, None
+        else:
+            for row in range(ROWS):
+                for col in range(COLS):
+                    if tempBoard.squares[row][col].hasAllyPiece(WHITE):
+                        piece = tempBoard.squares[row][col].piece
+                        tempBoard.calValidMoves(piece,row,col)
+                        for move in piece.moves:
+                            board = copy.deepcopy(tempBoard)
+                            #backtrackMove = Move(move.finalPos, move.initialPos)
+                            board.move(piece,move)
+                            moveValue = self.minValue(board, cutoff-1)[0]
+                            valList.append(moveValue)
+                            pieceList.append(piece)
+                            moveList.append(move)
+                            #tempBoard.move(piece,backtrackMove) #move the piece back, to save processing power
+        
+        #print("MaxValues:")
+        #print(pieceList)
+        #print(moveList)
+        #print(valList)
+        chosenPiece = pieceList[valList.index(max(valList))]
+        chosenMove = moveList[valList.index(max(valList))]
+        print(chosenMove)
+        return max(valList), chosenPiece, chosenMove
+
+    def minValue(self, tempBoard, cutoff):
+        moveList = []
+        pieceList = []
+        valList = []
+        if cutoff == 0:
+            return self.calBoardValue(tempBoard), None, None
+        else:
+            for row in range(ROWS):
+                for col in range(COLS):
+                    if tempBoard.squares[row][col].hasAllyPiece(BLACK):
+                        piece = tempBoard.squares[row][col].piece
+                        tempBoard.calValidMoves(piece,row,col)
+                        for move in piece.moves:
+                            board = copy.deepcopy(tempBoard)
+                            #backtrackMove = Move(move.finalPos, move.initialPos)
+                            board.move(piece,move)
+                            moveValue = self.maxValue(board, cutoff-1)[0]
+                            valList.append(moveValue)
+                            pieceList.append(piece)
+                            moveList.append(move)
+                            #tempBoard.move(piece,backtrackMove) #move the piece back, to save processing power
+        
+        #print("MinValues:")
+        #print(pieceList)
+        #print(moveList)
+        #print(valList)
+        chosenPiece = pieceList[valList.index(min(valList))]
+        chosenMove = moveList[valList.index(min(valList))]
+        print(chosenMove)
+        return min(valList), chosenPiece, chosenMove
+    
     def alphaBetaPruning(self, board, color):
-        pass
+        cutoffVal = ALPHABETA_CUTOFF
+        alpha = -10000
+        beta = 10000
+        tempBoard = copy.deepcopy(board)
+        if color == BLACK:
+            returnsTuple = self.betaValue(tempBoard, cutoffVal, alpha, beta)
+        else:
+            returnsTuple = self.alphaValue(tempBoard, cutoffVal, alpha, beta)
+        return returnsTuple[1], returnsTuple[2]
+    def alphaValue(self, tempBoard, cutoff, alpha, beta):
+        moveList = []
+        pieceList = []
+        valList = []
+        if cutoff == 0:
+            return self.calBoardValue(tempBoard), None, None, alpha, beta
+        else:
+            for row in range(ROWS):
+                for col in range(COLS):
+                    if tempBoard.squares[row][col].hasAllyPiece(WHITE):
+                        piece = tempBoard.squares[row][col].piece
+                        tempBoard.calValidMoves(piece,row,col)
+                        for move in piece.moves:
+                            board = copy.deepcopy(tempBoard)
+                            #backtrackMove = Move(move.finalPos, move.initialPos)
+                            board.move(piece,move)
+                            returnTuple = self.betaValue(board, cutoff-1, alpha, beta)
+                            moveValue = returnTuple[0]
+                            alpha = max(returnTuple[3], alpha)
+                            beta = returnTuple[4]
+                            if moveValue >= beta:
+                                return moveValue, piece, move, moveValue, beta
+                            valList.append(moveValue)
+                            pieceList.append(piece)
+                            moveList.append(move)
+                            #tempBoard.move(piece,backtrackMove) #move the piece back, to save processing power
+        
+        #print("MaxValues:")
+        #print(pieceList)
+        #print(moveList)
+        #print(valList)
+        if (len(valList) == 0): #No moves are available
+            return -10000, None, None, alpha, beta
+        chosenPiece = pieceList[valList.index(max(valList))]
+        chosenMove = moveList[valList.index(max(valList))]
+        #print(chosenMove)
+        return max(valList), chosenPiece, chosenMove, alpha, beta
+
+    def betaValue(self, tempBoard, cutoff, alpha, beta):
+        moveList = []
+        pieceList = []
+        valList = []
+        if cutoff == 0:
+            return self.calBoardValue(tempBoard), None, None, alpha, beta
+        else:
+            for row in range(ROWS):
+                for col in range(COLS):
+                    if tempBoard.squares[row][col].hasAllyPiece(BLACK):
+                        piece = tempBoard.squares[row][col].piece
+                        tempBoard.calValidMoves(piece,row,col)
+                        for move in piece.moves:
+                            board = copy.deepcopy(tempBoard)
+                            #backtrackMove = Move(move.finalPos, move.initialPos)
+                            board.move(piece,move)
+                            returnTuple = self.alphaValue(board, cutoff-1, alpha, beta)
+                            moveValue = returnTuple[0]
+                            alpha = returnTuple[3]
+                            beta = min(returnTuple[4],beta)
+                            if moveValue <= alpha:
+                                return moveValue, piece, move, alpha, moveValue
+                            valList.append(moveValue)
+                            pieceList.append(piece)
+                            moveList.append(move)
+                            #tempBoard.move(piece,backtrackMove) #move the piece back, to save processing power
+        
+        #print("MinValues:")
+        #print(pieceList)
+        #print(moveList)
+        #print(valList)
+        if (len(valList) == 0):#No moves are available
+            return 10000, None, None, alpha, beta
+        chosenPiece = pieceList[valList.index(min(valList))]
+        chosenMove = moveList[valList.index(min(valList))]
+        #print(chosenMove)
+        return min(valList), chosenPiece, chosenMove, alpha, beta

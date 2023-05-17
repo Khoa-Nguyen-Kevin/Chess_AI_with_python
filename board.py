@@ -404,21 +404,18 @@ class Board:
                                 #Rook move
                                 initialPos = Square(rookRow, 0)
                                 finalPos = Square(rookRow, 3)
-                                move = Move(initialPos, finalPos)
-                                if calInCheck:
-                                    if not self.inCheck(leftRook, move):
-                                        leftRook.addMove(move)
-                                else:
-                                    leftRook.addMove(move)
+                                Rmove = Move(initialPos, finalPos)
                                 #King move
                                 initialPos = Square(rookRow, col)
                                 finalPos = Square(rookRow, 2)
-                                move = Move(initialPos, finalPos)
+                                Kmove = Move(initialPos, finalPos)
                                 if calInCheck:
-                                    if not self.inCheck(piece, move):
-                                        piece.addMove(move)
+                                    if not self.inCheck(piece, Kmove) and not self.inCheck(leftRook, Rmove):
+                                        piece.addMove(Kmove)
+                                        leftRook.addMove(Rmove)
                                 else:
-                                    piece.addMove(move)
+                                    piece.addMove(Kmove)
+                                    leftRook.addMove(Rmove)
                 #Queen castling
                 rightRook = self.squares[row][7].piece if piece.color == WHITE else self.squares[0][7].piece
                 rookRow = row if piece.color == WHITE else 0
@@ -432,21 +429,18 @@ class Board:
                                 #Rook move
                                 initialPos = Square(rookRow, 7)
                                 finalPos = Square(rookRow, 5)
-                                move = Move(initialPos, finalPos)
-                                if calInCheck:
-                                    if not self.inCheck(rightRook, move):
-                                        rightRook.addMove(move)
-                                else:
-                                    rightRook.addMove(move)
+                                Rmove = Move(initialPos, finalPos)
                                 #King move
                                 initialPos = Square(rookRow, col)
                                 finalPos = Square(rookRow, 6)
-                                move = Move(initialPos, finalPos)
+                                Kmove = Move(initialPos, finalPos)
                                 if calInCheck:
-                                    if not self.inCheck(piece, move):
-                                        piece.addMove(move)
+                                    if not self.inCheck(piece, Kmove) and not self.inCheck(rightRook, Rmove):
+                                        piece.addMove(Kmove)
+                                        rightRook.addMove(Rmove)
                                 else:
-                                    piece.addMove(move)
+                                    piece.addMove(Kmove)
+                                    rightRook.addMove(Rmove)
     def isValidMove(self, piece, move):
         return move in piece.moves
     def checkPawnPromotion(self, piece, finalPos):
